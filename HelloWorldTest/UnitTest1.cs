@@ -62,7 +62,7 @@ namespace HelloWorldTest
             Assert.True(LineContainsIgnoreSpaces($"Listan loput luvut ovat indeksisijainnissa 4 ja 6: {expectedRemaining[0]} ja {expectedRemaining[1]}", result[5]),
                 $"Expected: 'Listan loput luvut ovat indeksisijainnissa 4 ja 6: {expectedRemaining[0]} ja {expectedRemaining[1]}' but got: '{result[5]}'");
         }
-        private bool LineContainsIgnoreSpaces(string line, string expectedText)
+        private bool LineContainsIgnoreSpaces( string expectedText, string line)
         {
             // Remove all whitespace and convert to lowercase
             string normalizedLine = Regex.Replace(line, @"[\s.,]+", "").ToLower();
