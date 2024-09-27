@@ -9,44 +9,50 @@ namespace HelloWorldTest
     public class UnitTest1
     {
 
-
         [Theory]
-        [InlineData(new double[] { 5.7, 9.8, 0.8, 4.6, 1.6, 7.9, 3.7, 2.1, 1.0, 6.6 })]
-        [InlineData(new double[] { 6.7, 1.8, 5.8, 4.2, 1.0, 7.9, 3.7, 2.1, 1.0, 6.6 })]
-        [Trait("TestGroup", "TestCalculations")]
-        public void TestCalculations(double[] inputNumbers)
+        [InlineData("5,7\n9,8\n0,8\n4,6\n1,6\n7,9\n3,7\n2,1\n1,0\n6,6\n")]
+        [InlineData("6,7\n1,8\n5,8\n4,2\n1,0\n7,9\n3,7\n2,1\n1,0\n6,6\n")]
+        [Trait("TestGroup", "ListCalculations")]
+        public void TestCalculations(string userInput)
         {
             // Arrange
             using var sw = new StringWriter();
             Console.SetOut(sw); // Capture console output
 
-            var numerolista = new List<double>(inputNumbers);
-
-            // Calculate expected results
-            double expectedSum = numerolista[3] + numerolista[5];
-            double expectedDifference = numerolista[1] - numerolista[8];
-            double expectedProduct = numerolista[0] * numerolista[9];
-            double expectedQuotient = numerolista[2] / numerolista[7];
-            double[] expectedRemaining = { numerolista[4], numerolista[6] };
+            // Simulate user input for decimal numbers
+            var input = new StringReader(userInput);
+            Console.SetIn(input); // Mock the user input
 
             // Act
-            Console.WriteLine("Indeksisijainnin 3 ja 5 lukujen summa: " + numerolista[3] + " + " + numerolista[5] + " = " + expectedSum);
-            Console.WriteLine("Indeksisijainnin 1 ja 8 lukujen erotus: " + numerolista[1] + " - " + numerolista[8] + " = " + expectedDifference);
-            Console.WriteLine("Indeksisijainnin 0 ja 9 lukujen tulo: " + numerolista[0] + " * " + numerolista[9] + " = " + expectedProduct);
-            Console.WriteLine("Indeksisijainnin 2 ja 7 lukujen osamaara: " + numerolista[2] + " / " + numerolista[7] + " = " + expectedQuotient);
-            Console.WriteLine("Listan loput luvut ovat indeksisijainnissa 4 ja 6: " + expectedRemaining[0] + " ja " + expectedRemaining[1]);
+            HelloWorld.Program.Main(new string[0]); // Run the Main method
 
             // Get the console output
-            var result = sw.ToString();
+            var result = sw.ToString().Split(new[] { "\r\n", "\n" }, StringSplitOptions.RemoveEmptyEntries);
 
-            // Assert using LineContainsIgnoreSpaces
-            Assert.True(LineContainsIgnoreSpaces(result, $"Indeksisijainnin 3 ja 5 lukujen summa: {numerolista[3]} + {numerolista[5]} = {expectedSum}"));
-            Assert.True(LineContainsIgnoreSpaces(result, $"Indeksisijainnin 1 ja 8 lukujen erotus: {numerolista[1]} - {numerolista[8]} = {expectedDifference}"));
-            Assert.True(LineContainsIgnoreSpaces(result, $"Indeksisijainnin 0 ja 9 lukujen tulo: {numerolista[0]} * {numerolista[9]} = {expectedProduct}"));
-            Assert.True(LineContainsIgnoreSpaces(result, $"Indeksisijainnin 2 ja 7 lukujen osamaara: {numerolista[2]} / {numerolista[7]} = {expectedQuotient}"));
-            Assert.True(LineContainsIgnoreSpaces(result, $"Listan loput luvut ovat indeksisijainnissa 4 ja 6: {expectedRemaining[0]} ja {expectedRemaining[1]}"));
+            // Debug output to see the actual result
+            for (int i = 0; i < result.Length; i++)
+            {
+                Console.WriteLine($"Line {i}: '{result[i]}'");
+            }
+
+            // Assert that the output contains enough lines
+            Assert.True(result.Length >= 5, "The output does not contain enough lines.");
+
+            // Extract expected values from user input
+            var numbers = userInput.Trim().Split('\n').Select(double.Parse).ToArray();
+            double expectedSum = numbers[3] + numbers[5];
+            double expectedDifference = numbers[1] - numbers[8];
+            double expectedProduct = numbers[0] * numbers[9];
+            double expectedQuotient = numbers[2] / numbers[7];
+            double[] expectedRemaining = { numbers[4], numbers[6] };
+
+            // Check the console output for the expected calculations
+            Assert.True(LineContainsIgnoreSpaces($"Indeksisijainnin 3 ja 5 lukujen summa: {numbers[3]} + {numbers[5]} = {expectedSum}", result[1]));
+            Assert.True(LineContainsIgnoreSpaces($"Indeksisijainnin 1 ja 8 lukujen erotus: {numbers[1]} - {numbers[8]} = {expectedDifference}", result[2]));
+            Assert.True(LineContainsIgnoreSpaces($"Indeksisijainnin 0 ja 9 lukujen tulo: {numbers[0]} * {numbers[9]} = {expectedProduct}", result[3]));
+            Assert.True(LineContainsIgnoreSpaces($"Indeksisijainnin 2 ja 7 lukujen osam‰‰r‰: {numbers[2]} / {numbers[7]} = {expectedQuotient}", result[4]));
+            Assert.True(LineContainsIgnoreSpaces($"Listan loput luvut ovat indeksisijainnissa 4 ja 6: {expectedRemaining[0]} ja {expectedRemaining[1]}", result[5]));
         }
-
         private bool LineContainsIgnoreSpaces(string line, string expectedText)
         {
             // Remove all whitespace and convert to lowercase
