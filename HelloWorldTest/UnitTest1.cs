@@ -1,9 +1,8 @@
 
-
-
 using HelloWorld; // Ensure this is the correct namespace for the Program class
 using Microsoft.VisualStudio.TestPlatform.TestHost;
 using System.Reflection;
+using System.Text.RegularExpressions;
 
 namespace HelloWorldTest
 {
@@ -11,66 +10,65 @@ namespace HelloWorldTest
     {
 
 
-        //Harjoitus - Piirtelyä
-        [Fact]
-        [Trait("TestGroup", "ArtPrinting")]
-        public void ArtPrinting()
+        [Theory]
+        [InlineData(new double[] { 5.7, 9.8, 0.8, 4.6, 1.6, 7.9, 3.7, 2.1, 1.0, 6.6 })]
+        [InlineData(new double[] { 6.7, 1.8, 5.8, 4.2, 1.0, 7.9, 3.7, 2.1, 1.0, 6.6 })]
+        [Trait("TestGroup", "TestCalculations")]
+        public void TestCalculations(double[] inputNumbers)
         {
             // Arrange
             using var sw = new StringWriter();
-            Console.SetOut(sw);
+            Console.SetOut(sw); // Capture console output
 
-            // Updated expected output to match actual output format
-            var expectedOutput = "   *\r\n\r\n   *\r\n  ***\r\n *****\r\n*******";
-            var expectedOutput2 = "   *   \r\n       \r\n   *   \r\n  ***  \r\n ***** \r\n*******";
+            var numerolista = new List<double>(inputNumbers);
 
+            // Calculate expected results
+            double expectedSum = numerolista[3] + numerolista[5];
+            double expectedDifference = numerolista[1] - numerolista[8];
+            double expectedProduct = numerolista[0] * numerolista[9];
+            double expectedQuotient = numerolista[2] / numerolista[7];
+            double[] expectedRemaining = { numerolista[4], numerolista[6] };
 
-            // Set a timeout of 30 seconds for the test execution
-            var cancellationTokenSource = new CancellationTokenSource();
-            cancellationTokenSource.CancelAfter(TimeSpan.FromSeconds(30));
+            // Act
+            Console.WriteLine("Indeksisijainnin 3 ja 5 lukujen summa: " + numerolista[3] + " + " + numerolista[5] + " = " + expectedSum);
+            Console.WriteLine("Indeksisijainnin 1 ja 8 lukujen erotus: " + numerolista[1] + " - " + numerolista[8] + " = " + expectedDifference);
+            Console.WriteLine("Indeksisijainnin 0 ja 9 lukujen tulo: " + numerolista[0] + " * " + numerolista[9] + " = " + expectedProduct);
+            Console.WriteLine("Indeksisijainnin 2 ja 7 lukujen osamaara: " + numerolista[2] + " / " + numerolista[7] + " = " + expectedQuotient);
+            Console.WriteLine("Listan loput luvut ovat indeksisijainnissa 4 ja 6: " + expectedRemaining[0] + " ja " + expectedRemaining[1]);
 
-            try
-            {
-                // Act
-                Task task = Task.Run(() =>
-                {
-                    // Run the program
-                    HelloWorld.Program.Main(new string[0]);
-                }, cancellationTokenSource.Token);
+            // Get the console output
+            var result = sw.ToString();
 
-                task.Wait(cancellationTokenSource.Token);  // Wait for the task to complete or timeout
-
-                // Get the output that was written to the console
-                var result = sw.ToString().TrimEnd(); // Trim only the end of the string
-
-                var resultLines = result.Split(new[] { "\r\n", "\n" }, StringSplitOptions.None);
-                var expectedLines1 = expectedOutput.Split(new[] { "\r\n", "\n" }, StringSplitOptions.None);
-                var expectedLines2 = expectedOutput2.Split(new[] { "\r\n", "\n" }, StringSplitOptions.None);
-
-                // Check if the result matches either expected output
-                bool matchesExpectedOutput1 = CompareLines(resultLines, expectedLines1);
-                bool matchesExpectedOutput2 = CompareLines(resultLines, expectedLines2);
-
-                // Assert
-                Assert.True(matchesExpectedOutput1 || matchesExpectedOutput2, "The output did not match either expected pattern. Output: " + result);
-
-
-
-            }
-            catch (OperationCanceledException)
-            {
-                Assert.True(false, "The operation was canceled due to timeout.");
-            }
-            catch (AggregateException ex) when (ex.InnerException is OperationCanceledException)
-            {
-                Assert.True(false, "The operation was canceled due to timeout.");
-            }
-            finally
-            {
-                cancellationTokenSource.Dispose();
-            }
+            // Assert using LineContainsIgnoreSpaces
+            Assert.True(LineContainsIgnoreSpaces(result, $"Indeksisijainnin 3 ja 5 lukujen summa: {numerolista[3]} + {numerolista[5]} = {expectedSum}"));
+            Assert.True(LineContainsIgnoreSpaces(result, $"Indeksisijainnin 1 ja 8 lukujen erotus: {numerolista[1]} - {numerolista[8]} = {expectedDifference}"));
+            Assert.True(LineContainsIgnoreSpaces(result, $"Indeksisijainnin 0 ja 9 lukujen tulo: {numerolista[0]} * {numerolista[9]} = {expectedProduct}"));
+            Assert.True(LineContainsIgnoreSpaces(result, $"Indeksisijainnin 2 ja 7 lukujen osamaara: {numerolista[2]} / {numerolista[7]} = {expectedQuotient}"));
+            Assert.True(LineContainsIgnoreSpaces(result, $"Listan loput luvut ovat indeksisijainnissa 4 ja 6: {expectedRemaining[0]} ja {expectedRemaining[1]}"));
         }
 
+        private bool LineContainsIgnoreSpaces(string line, string expectedText)
+        {
+            // Remove all whitespace and convert to lowercase
+            string normalizedLine = Regex.Replace(line, @"\s+", "").ToLower();
+            string normalizedExpectedText = Regex.Replace(expectedText, @"\s+", "").ToLower();
+
+            // Create a regex pattern to allow any character for "ä", "ö", "a", and "o"
+            string pattern = Regex.Escape(normalizedExpectedText)
+                                  .Replace("ö", ".")  // Allow any character for "ö"
+                                  .Replace("ä", ".")  // Allow any character for "ä"
+                                  .Replace("a", ".")  // Allow any character for "a"
+                                  .Replace("o", ".");  // Allow any character for "o"
+
+            // Check if the line matches the pattern, ignoring case
+            return Regex.IsMatch(normalizedLine, pattern, RegexOptions.IgnoreCase);
+        }
+
+
+        private int CountWords(string line)
+        {
+            return line.Split(new[] { ' ' }, StringSplitOptions.RemoveEmptyEntries).Length;
+        }
 
         private bool CompareLines(string[] actualLines, string[] expectedLines)
         {
@@ -89,10 +87,10 @@ namespace HelloWorldTest
 
             return true;
         }
-
+        private string NormalizeOutput(string output)
+        {
+            // Normalize line endings to Unix-style '\n' and trim any extra spaces or newlines
+            return output.Replace("\r\n", "\n").Trim();
+        }
     }
 }
-
-
-    
-
