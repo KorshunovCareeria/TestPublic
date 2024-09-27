@@ -56,8 +56,8 @@ namespace HelloWorldTest
             Assert.True(LineContainsIgnoreSpaces($"Indeksisijainnin 0 ja 9 lukujen tulo: {numbers[0]} * {numbers[9]} = {expectedProduct}", result[3]),
                 $"Expected: 'Indeksisijainnin 0 ja 9 lukujen tulo: {numbers[0]} * {numbers[9]} = {expectedProduct}' but got: '{result[3]}'");
 
-            Assert.True(LineContainsIgnoreSpaces($"Indeksisijainnin 2 ja 7 lukujen osam‰‰r‰: {numbers[2]} / {numbers[7]} = {expectedQuotient}", result[4]),
-                $"Expected: 'Indeksisijainnin 2 ja 7 lukujen osam‰‰r‰: {numbers[2]} / {numbers[7]} = {expectedQuotient}' but got: '{result[4]}'");
+            Assert.True(LineContainsIgnoreSpaces($"Indeksisijainnin 2 ja 7 lukujen osamaara: {numbers[2]} / {numbers[7]} = {expectedQuotient}", result[4]),
+                $"Expected: 'Indeksisijainnin 2 ja 7 lukujen osamaara: {numbers[2]} / {numbers[7]} = {expectedQuotient}' but got: '{result[4]}'");
 
             Assert.True(LineContainsIgnoreSpaces($"Listan loput luvut ovat indeksisijainnissa 4 ja 6: {expectedRemaining[0]} ja {expectedRemaining[1]}", result[5]),
                 $"Expected: 'Listan loput luvut ovat indeksisijainnissa 4 ja 6: {expectedRemaining[0]} ja {expectedRemaining[1]}' but got: '{result[5]}'");
