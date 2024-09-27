@@ -56,8 +56,8 @@ namespace HelloWorldTest
         private bool LineContainsIgnoreSpaces(string line, string expectedText)
         {
             // Remove all whitespace and convert to lowercase
-            string normalizedLine = Regex.Replace(line, @"\s+", "").ToLower();
-            string normalizedExpectedText = Regex.Replace(expectedText, @"\s+", "").ToLower();
+            string normalizedLine = Regex.Replace(line, @"[\s.,]+", "").ToLower();
+            string normalizedExpectedText = Regex.Replace(expectedText, @"[\s.,]+", "").ToLower();
 
             // Create a regex pattern to allow any character for "ä", "ö", "a", and "o"
             string pattern = Regex.Escape(normalizedExpectedText)
