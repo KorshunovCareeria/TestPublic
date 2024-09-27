@@ -12,7 +12,7 @@ namespace HelloWorldTest
         [Theory]
         [InlineData("5,7\n9,8\n0,8\n4,6\n1,6\n7,9\n3,7\n2,1\n1,0\n6,6\n")]
         [InlineData("6,7\n1,8\n5,8\n4,2\n1,0\n7,9\n3,7\n2,1\n1,0\n6,6\n")]
-        [Trait("TestGroup", "ListCalculations")]
+        [Trait("TestGroup", "TestCalculations")]
         public void TestCalculations(string userInput)
         {
             // Arrange
